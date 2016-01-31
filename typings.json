@@ -1,0 +1,16 @@
+{
+  "name": "generic-pool",
+  "main": "generic-pool.d.ts",
+  "author": "goenning <oenning.ti@gmail.com>",
+  "keywords": [
+    "throttle",
+    "pooling",
+    "pool"
+  ],
+  "description": "The TypeScript definition for generic-pool (coopernurse/node-pool)",
+  "url": "https://github.com/goenning/typed-generic-pool/",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "ambientDependencies": { }
+}

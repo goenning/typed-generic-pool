@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"noEmit": true
+	},
+	"filesGlob": [
+		"generic-pool.d.ts",
+		"tests/*.ts"
+	],
+	"files": [
+		"generic-pool.d.ts",
+		"tests/client.ts",
+		"tests/common.ts",
+		"tests/defaults.ts",
+		"tests/query.ts"
+	],
+	"formatCodeOptions": {
+		"indentSize": 2,
+		"tabSize": 2
+	},
+	"atom": {
+		"rewriteTsconfig": true,
+		"formatOnSave": true
+	}
+}
