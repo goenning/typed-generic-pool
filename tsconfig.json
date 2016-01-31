@@ -4,11 +4,11 @@
 		"noEmit": true
 	},
 	"filesGlob": [
-		"generic-pool.d.ts",
+		"index.d.ts",
 		"tests/*.ts"
 	],
 	"files": [
-		"generic-pool.d.ts",
+		"index.d.ts",
 		"tests/common.ts",
 		"tests/info.ts",
 		"tests/pooled.ts",
