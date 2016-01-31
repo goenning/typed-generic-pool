@@ -3,24 +3,22 @@ import {Pool} from "../generic-pool.d"
 var pool = new Pool({
   name: 'mysql',
   create: function(callback) {
-    callback(null, null)
   },
   destroy: function(client) {
-    client.end();
   },
   max: 10,
-  min: 2,
   idleTimeoutMillis: 30000,
-  log: true
+  priorityRange: 3
 });
 
 pool.acquire(function(err, client) {
-  client.query("select * from foo", [], function() {
-    // return object back to pool
-    pool.release(client);
-  });
+  pool.release(client);
 });
 
-pool.drain(function() {
-  pool.destroyAllNow();
-});
+pool.acquire(function(err, client) {
+  pool.release(client);
+}, 0);
+
+pool.acquire(function(err, client) {
+  pool.release(client);
+}, 1);
