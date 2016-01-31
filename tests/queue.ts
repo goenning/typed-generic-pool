@@ -1,4 +1,4 @@
-import {Pool} from "../generic-pool.d"
+import {Pool} from "../index.d"
 
 var pool = new Pool({
   name: 'mysql',
