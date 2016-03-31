@@ -17,11 +17,11 @@ interface Factory {
 export class Pool {
   constructor(factory: Factory)
 
-  acquire(callback: (err: Error, client: any) => void, priority?: number)
-  release(client: any)
-  drain(callback: () => void)
-  destroyAllNow()
-  pooled(callback: (client: any, arg: any, cb: (err: Error, arg: any) => void) => void)
+  acquire(callback: (err: Error, client: any) => void, priority?: number): void
+  release(client: any): void
+  drain(callback: () => void): void
+  destroyAllNow(): void
+  pooled(callback: (client: any, arg: any, cb: (err: Error, arg: any) => void) => void): void
 
   getName(): string
   getPoolSize(): number
