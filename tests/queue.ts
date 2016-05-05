@@ -1,7 +1,7 @@
 import {Pool} from "../index.d"
 
-var pool = new Pool({
-  name: 'mysql',
+var pool = new Pool<String>({
+  name: 'demo',
   create: function(callback) {
   },
   destroy: function(client) {

@@ -1,6 +1,6 @@
 import {Pool} from "../index.d"
 
-var pool = new Pool({
+var pool = new Pool<Boolean>({
   create: () => { },
   destroy: () => { }
 });

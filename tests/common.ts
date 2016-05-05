@@ -1,12 +1,12 @@
 import {Pool} from "../index.d"
 
-var pool = new Pool({
-  name: 'mysql',
+var pool = new Pool<String>({
+  name: 'demo',
   create: function(callback) {
-    callback(null, null)
+    callback(null, 'Hello World')
   },
   destroy: function(client) {
-    client.end();
+
   },
   max: 10,
   min: 2,
@@ -15,10 +15,7 @@ var pool = new Pool({
 });
 
 pool.acquire(function(err, client) {
-  client.query("select * from foo", [], function() {
-    // return object back to pool
-    pool.release(client);
-  });
+  pool.release(client);
 });
 
 pool.drain(function() {
