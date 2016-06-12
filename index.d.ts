@@ -75,6 +75,9 @@ export class Pool<T> {
   /** Disallow any new requests and let the request backlog dissapate. */
   drain(callback: () => void): void
   
+  /** Request the client to be destroyed. The factory's destroy handler will also be called. */
+  destroy(client: T): void
+  
   /**
    * Forcibly destroys all clients regardless of timeout. Intended to be 
    * invoked as part of a drain. Does not prevent the creation of new 
