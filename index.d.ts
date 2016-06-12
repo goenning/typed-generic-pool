@@ -4,7 +4,7 @@ interface Factory<T> {
   name?: string
   
   /** function that returns a new resource, should call callback with the created resource */
-  create: (callback: (err: Error | void, client: T) => void) => void
+  create: (callback: (err: Error | void, client?: T) => void) => void
   
   /** function that accepts a resource and destroys it */
   destroy: (client: T) => void
