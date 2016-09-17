@@ -4,7 +4,7 @@ interface Factory<T> {
   name?: string
   
   /** function that returns a new resource, should call callback with the created resource */
-  create: (callback: (err: Error | void, client?: T) => void) => void
+  create: (callback: (err: any, client?: T) => void) => void
   
   /** function that accepts a resource and destroys it */
   destroy: (client: T) => void
@@ -67,7 +67,7 @@ export class Pool<T> {
   constructor(factory: Factory<T>)
   
   /** Request a new client. The callback will be called, when a new client will be availabe, passing the client to it. */
-  acquire(callback: (err?: Error, client?: T) => void, priority?: number): boolean
+  acquire(callback: (err?: any, client?: T) => void, priority?: number): boolean
   
   /** Return the client to the pool, in case it is no longer required */
   release(client: T): void
