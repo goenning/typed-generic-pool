@@ -1,14 +1,13 @@
-import {Pool} from "../index.d"
+import { Pool } from '../index';
 
-var pool = new Pool<Boolean>({
-  create: () => { },
-  destroy: () => { }
+const pool = new Pool<Boolean>({
+  create: () => undefined,
+  destroy: () => undefined
 });
 
-
-pool.getName()
-pool.getPoolSize()
-pool.availableObjectsCount()
-pool.waitingClientsCount()
-pool.getMaxPoolSize()
-pool.getMinPoolSize()
+pool.getName();
+pool.getPoolSize();
+pool.availableObjectsCount();
+pool.waitingClientsCount();
+pool.getMaxPoolSize();
+pool.getMinPoolSize();

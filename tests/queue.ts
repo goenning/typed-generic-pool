@@ -1,6 +1,6 @@
-import {Pool} from "../index.d"
+import { Pool } from '../index';
 
-var pool = new Pool<String>({
+const pool = new Pool<string>({
   name: 'demo',
   create: function(callback) {
   },
@@ -11,14 +11,14 @@ var pool = new Pool<String>({
   priorityRange: 3
 });
 
-pool.acquire(function(err, client) {
+pool.acquire(function (err, client) {
   pool.release(client);
 });
 
-pool.acquire(function(err, client) {
+pool.acquire(function (err, client) {
   pool.release(client);
 }, 0);
 
-pool.acquire(function(err, client) {
+pool.acquire(function (err, client) {
   pool.release(client);
 }, 1);

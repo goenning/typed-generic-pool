@@ -1,6 +1,6 @@
-# Typed generic-pool
+# Typed Generic Pool
 
-The type definition for [generic-pool](https://github.com/coopernurse/node-pool).
+The type definition for [`generic-pool`](https://github.com/coopernurse/node-pool).
 
 ## License
 

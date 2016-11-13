@@ -1,0 +1,32 @@
+{
+  "name": "@types/generic-pool",
+  "version": "2.4.0",
+  "description": "Types for https://github.com/coopernurse/node-pool",
+  "typings": "index.d.ts",
+  "scripts": {
+    "lint": "tslint \"**/*.ts\" -e \"node_modules/**\" -e \"typings/**\" -e bundle.d.ts",
+    "exec": "tsc",
+    "test": "npm run lint && npm run exec",
+    "prepublish": "typings install",
+    "postpublish": "greenkeeper-postpublish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/types/npm-generic-pool.git"
+  },
+  "author": "goenning <oenning.ti@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/types/npm-generic-pool/issues"
+  },
+  "homepage": "https://github.com/types/npm-generic-pool#readme",
+  "devDependencies": {
+    "generic-pool": "^2.4.6",
+    "greenkeeper-postpublish": "^1.0.1",
+    "ts-node": "^1.3.0",
+    "tslint": "^3.15.1",
+    "tslint-config-typings": "^0.2.4",
+    "typescript": "^2.0.3",
+    "typings": "^2.0.0"
+  }
+}

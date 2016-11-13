@@ -1,25 +1,12 @@
 {
-	"compilerOptions": {
-		"target": "es5",
-		"noEmit": true
-	},
-	"filesGlob": [
-		"index.d.ts",
-		"tests/*.ts"
-	],
-	"files": [
-		"index.d.ts",
-		"tests/common.ts",
-		"tests/info.ts",
-		"tests/pooled.ts",
-		"tests/queue.ts"
-	],
-	"formatCodeOptions": {
-		"indentSize": 2,
-		"tabSize": 2
-	},
-	"atom": {
-		"rewriteTsconfig": true,
-		"formatOnSave": true
-	}
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["es2015"],
+    "module": "commonjs",
+    "noEmit": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "strictNullChecks": true
+  }
 }

@@ -1,9 +1,9 @@
-import {Pool} from "../index.d"
+import { Pool } from '../index';
 
-var pool = new Pool<String>({
+const pool = new Pool<string>({
   name: 'demo',
   create: function(callback) {
-    callback(null, 'Hello World')
+    callback(null, 'Hello World');
   },
   destroy: function(client) {
 
@@ -14,10 +14,10 @@ var pool = new Pool<String>({
   log: true
 });
 
-pool.acquire(function(err, client) {
+pool.acquire(function (err, client) {
   pool.release(client);
 });
 
-pool.drain(function() {
+pool.drain(function () {
   pool.destroyAllNow();
 });
