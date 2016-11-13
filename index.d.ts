@@ -1,113 +1,145 @@
-interface Factory<T> {
+import { EventEmitter } from 'events';
+
+export interface Factory<T> {
 
   /** name of pool */
   name?: string;
 
-  /** function that returns a new resource, should call callback with the created resource */
-  create: (callback: (err: Error | null | undefined, client?: T) => void) => void;
-
-  /** function that accepts a resource and destroys it */
-  destroy: (client: T) => void;
-
-  /** maximum number of resources to create at any given time (optional, default=1) */
-  max?: number;
+  /**
+   * A function that the pool will call when it wants a new resource. It should return a `Promise` that either resolves to a `resource` or rejects to an `Error` if it is unable to create a resourse for whatever.
+   */
+  create(): T | Promise<T>;
 
   /**
-   * minimum number of resources to keep in pool at any given time
-   * if this is set >= max, the pool will silently set the min to factory.max - 1 (Note: min==max case is expected to change in v3 release)
-   * optional (default=0)
+   * A function that the pool will call when it wants to destroy a resource. It should accept one argument resource where `resource` is whatever `factory.create` made. The `destroy` function should return a `Promise` that resolves once it has destroyed the resource.
    */
-  min?: number;
-
-  /** boolean that specifies whether idle resources at or below the min threshold should be destroyed/re-created. optional (default=true) */
-  refreshIdle?: boolean;
-
-  /** max milliseconds a resource can go unused before it should be destroyed (default 30000) */
-  idleTimeoutMillis?: number;
-
-  /** frequency to check for idle resources (default 1000) */
-  reapIntervalMillis?: number;
+  destroy(resource: T): void | Promise<void>;
 
   /**
-   * boolean, if true the most recently released resources will be the first to be allocated.
-   * This in effect turns the pool's behaviour from a queue into a stack. optional (default false)
+   * A function that the pool will call if it wants to validate a resource. It should accept one argument resource where `resource` is whatever `factory.create` made. Should return a `Promise` that resolves a `boolean` where `true` indicates the resource is still valid or `false` if the resource is invalid.
    */
-  returnToHead?: boolean;
-
-  /** int between 1 and x - if set, borrowers can specify their relative priority in the queue if no resources are available. (default 1) */
-  priorityRange?: number;
-
-  /**
-   * function that accepts a pooled resource and returns true if the resource is OK to use, or false if the object is invalid.
-   * Invalid objects will be destroyed. This function is called in acquire() before returning a resource from the pool.
-   * Optional. Default function always returns true.
-   */
-  validate?: (client: T) => boolean;
-
-  /**
-   * Asynchronous validate function.
-   * Receives a callback function as its second argument, which should be called with a single boolean argument being true if the item is still valid and false if it should be removed from the pool.
-   * Called before item is acquired from pool. Default is undefined.
-   * Only one of validate/validateAsync may be specified
-   */
-  validateAsync?: (client: T, callback: (valid: boolean) => void) => void;
-
-  /**
-   * If a log is a function, it will be called with two parameters:
-   *  - log string
-   *  - log level ('verbose', 'info', 'warn', 'error')
-   * Else if log is true, verbose log info will be sent to console.log()
-   * Else internal log messages be ignored (this is the default)
-   */
-  log?: boolean | ((log: string, level: 'verbose' | 'info' | 'warn' | 'error') => void);
+  validate?(resource: T): boolean | Promise<boolean>;
 }
 
-export class Pool<T> {
+export interface Options {
+  /**
+   * Maximum number of resources to create at any given time. (default 1)
+   */
+  max?: number;
+  /**
+   * Minimum number of resources to keep in pool at any given time. If this is set >= max, the pool will silently set the min to equal `max`. (default 0)
+   */
+  min?: number;
+  /**
+   * Maximum number of queued requests allowed, additional `acquire` calls will be callback with an `err` in a future cycle of the event loop.
+   */
+  maxWaitingClients?: number;
+  /**
+   * Should the pool validate resources before giving them to clients. Requires that either `factory.validate` to be specified.
+   */
+  testOnBorrow?: boolean;
+  /**
+   * Max milliseconds a resource can stay unused in the pool without being borrowed before it should be destroyed (default 30000)
+   */
+  idleTimeoutMillis?: number;
+  /**
+   * Max milliseconds an acquire call will wait for a resource before timing out. (default no limit), if supplied should non-zero positive integer.
+   */
+  acquireTimeoutMillis?: number;
+  /**
+   * If true the oldest resources will be first to be allocated. If false the most recently released resources will be the first to be allocated. This in effect turns the pool's behaviour from a queue into a stack. (default true)
+   */
+  fifo?: boolean;
+  /**
+   * Int between 1 and x - if set, borrowers can specify their relative priority in the queue if no resources are available. see example. (default 1)
+   */
+  priorityRange?: number;
+  /**
+   * Should the pool start creating resources etc once the constructor is called. (default true)
+   */
+  autostart?: boolean;
+  /**
+   * How often to run eviction checks. (default 0, does not run)
+   */
+  evictionRunIntervalMillis?: number;
+  /**
+   * Number of resources to check each eviction run. (default 3)
+   */
+  numTestsPerRun?: number;
+  /**
+   * Amount of time an object may sit idle in the pool before it is eligible for eviction by the idle object evictor (if any), with the extra condition that at least "min idle" object instances remain in the pool. (default -1, nothing can get evicted)
+   */
+  softIdleTimeoutMillis?: number;
+  /**
+   * Promise lib, a Promises/A+ implementation that the pool should use. Defaults to whatever `global.Promise` is (usually native promises).
+   */
+  Promise?: typeof Promise;
+}
 
-  constructor(factory: Factory<T>);
+export function createPool<T>(factory: Factory<T>, options?: Options): Pool<T>;
 
-  /** Request a new client. The callback will be called, when a new client will be availabe, passing the client to it. */
-  acquire(callback: (err: Error | null | undefined, client: T) => void, priority?: number): boolean;
+export class Pool<T> extends EventEmitter {
 
-  /** Return the client to the pool, in case it is no longer required */
-  release(client: T): void;
-
-  /** Disallow any new requests and let the request backlog dissapate. */
-  drain(callback: () => void): void;
-
-  /** Request the client to be destroyed. The factory's destroy handler will also be called. */
-  destroy(client: T): void;
+  private constructor();
 
   /**
-   * Forcibly destroys all clients regardless of timeout. Intended to be
-   * invoked as part of a drain. Does not prevent the creation of new
-   * clients as a result of subsequent calls to acquire.
-   *
-   * Note that if factory.min > 0, the pool will destroy all idle resources
-   * in the pool, but replace them with newly created resources up to the
-   * specified factory.min value.  If this is not desired, set factory.min
-   * to zero before calling destroyAllNow()
+   * This function is for when you want to "borrow" a resource from the pool.
    */
-  destroyAllNow(): void;
+  acquire(priority?: number): Promise<T>;
 
-  /** Decorates a function to use a acquired client from the object pool when called. */
-  pooled(callback: (client: T, ...args: any[]) => any, priority?: number): (...args: any[]) => void;
+  /**
+   * This function is for when you want to return a resource to the pool.
+   */
+  release(resource: T): Promise<void>;
 
-  /** returns factory.name for this pool */
-  getName(): string;
+  /**
+   * This function is for when you want to return a resource to the pool but want it destroyed rather than being made available to other resources. E.g. you may know the resource has timed out or crashed.
+   */
+  destroy(resource: T): Promise<void>;
 
-  /** returns number of resources in the pool regardless of whether they are free or in use */
-  getPoolSize(): number;
+  /**
+   * If you are shutting down a long-lived process, you may notice that node fails to exit for 30 seconds or so. This is a side effect of the `idleTimeoutMillis` behavior -- the pool has a `setTimeout()` call registered that is in the event loop queue, so node won't terminate until all resources have timed out, and the pool stops trying to manage them.
+   *
+   * This behavior will be more problematic when you set factory.min > 0, as the pool will never become empty, and the `setTimeout` calls will never end.
+   *
+   * In these cases, use the pool.drain() function. This sets the pool into a "draining" state which will gracefully wait until all idle resources have timed out. For example, you can call:
+   *
+   * If you do this, your node process will exit gracefully.
+   */
+  drain(): Promise<void>;
 
-  /** returns number of unused resources in the pool */
-  availableObjectsCount(): number;
+  /**
+   * If you know you would like to terminate all the available resources in your pool before any timeouts they might have are reached, you can use `clear()` in conjunction with `drain()`:
+   *
+   * ```
+   * pool.drain().then(() => pool.clear());
+   * ```
+   */
+  clear(): Promise<void>;
 
-  /** returns number of callers waiting to acquire a resource */
-  waitingClientsCount(): number;
+  /**
+   * The combined count of the currently created objects and those in the
+   * process of being created. Does NOT include resources in the process of being destroyed.
+   */
+  readonly size: number;
 
-  /** returns number of maxixmum number of resources allowed by pool */
-  getMaxPoolSize(): number;
+  /**
+   * Number of available resources.
+   */
+  readonly available: number;
 
-  /** returns number of minimum number of resources allowed by pool */
-  getMinPoolSize(): number;
+  /**
+   * Number of waiting acquire calls.
+   */
+  readonly pending: number;
+
+  /**
+   * Maximum size of the pool.
+   */
+  readonly max: number;
+
+  /**
+   * Minimum size of the pool.
+   */
+  readonly min: number;
 }

@@ -1,23 +1,25 @@
-import { Pool } from '../index';
+import { createPool } from '../index';
 
-const pool = new Pool<string>({
-  name: 'demo',
-  create: function(callback) {
-    callback(null, 'Hello World');
+const pool = createPool(
+  {
+    create () {
+      return 'Hello World';
+    },
+    destroy (client) {
+
+    }
   },
-  destroy: function(client) {
+  {
+    max: 10,
+    min: 2,
+    idleTimeoutMillis: 30000
+  }
+);
 
-  },
-  max: 10,
-  min: 2,
-  idleTimeoutMillis: 30000,
-  log: true
-});
-
-pool.acquire(function (err, client) {
+pool.acquire().then(function (client) {
   pool.release(client);
 });
 
-pool.drain(function () {
-  pool.destroyAllNow();
+pool.drain().then(function () {
+  pool.clear();
 });

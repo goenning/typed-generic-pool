@@ -1,13 +1,12 @@
-import { Pool } from '../index';
+import { createPool } from '../index';
 
-const pool = new Pool<Boolean>({
-  create: () => undefined,
+const pool = createPool({
+  create: () => 'test',
   destroy: () => undefined
 });
 
-pool.getName();
-pool.getPoolSize();
-pool.availableObjectsCount();
-pool.waitingClientsCount();
-pool.getMaxPoolSize();
-pool.getMinPoolSize();
+pool.size;
+pool.available;
+pool.pending;
+pool.min;
+pool.max;

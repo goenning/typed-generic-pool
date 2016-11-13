@@ -1,24 +1,28 @@
-import { Pool } from '../index';
+import { createPool } from '../index';
 
-const pool = new Pool<string>({
-  name: 'demo',
-  create: function(callback) {
+const pool = createPool(
+  {
+    create: function () {
+      return Promise.resolve('test');
+    },
+    destroy: function (resource) {
+    }
   },
-  destroy: function(client) {
-  },
-  max: 10,
-  idleTimeoutMillis: 30000,
-  priorityRange: 3
+  {
+    max: 10,
+    idleTimeoutMillis: 30000,
+    priorityRange: 3
+  }
+);
+
+pool.acquire().then(function (client) {
+  pool.release(client);
 });
 
-pool.acquire(function (err, client) {
+pool.acquire(0).then(function (client) {
   pool.release(client);
 });
 
-pool.acquire(function (err, client) {
+pool.acquire(1).then(function (client) {
   pool.release(client);
-}, 0);
-
-pool.acquire(function (err, client) {
-  pool.release(client);
-}, 1);
+});
