@@ -8,17 +8,17 @@ export interface Factory<T> {
   /**
    * A function that the pool will call when it wants a new resource. It should return a `Promise` that either resolves to a `resource` or rejects to an `Error` if it is unable to create a resourse for whatever.
    */
-  create(): T | Promise<T>;
+  create(): T | PromiseLike<T>;
 
   /**
    * A function that the pool will call when it wants to destroy a resource. It should accept one argument resource where `resource` is whatever `factory.create` made. The `destroy` function should return a `Promise` that resolves once it has destroyed the resource.
    */
-  destroy(resource: T): void | Promise<void>;
+  destroy(resource: T): void | PromiseLike<void>;
 
   /**
    * A function that the pool will call if it wants to validate a resource. It should accept one argument resource where `resource` is whatever `factory.create` made. Should return a `Promise` that resolves a `boolean` where `true` indicates the resource is still valid or `false` if the resource is invalid.
    */
-  validate?(resource: T): boolean | Promise<boolean>;
+  validate?(resource: T): boolean | PromiseLike<boolean>;
 }
 
 export interface Options {
@@ -85,17 +85,17 @@ export class Pool<T> extends EventEmitter {
   /**
    * This function is for when you want to "borrow" a resource from the pool.
    */
-  acquire(priority?: number): Promise<T>;
+  acquire(priority?: number): PromiseLike<T>;
 
   /**
    * This function is for when you want to return a resource to the pool.
    */
-  release(resource: T): Promise<void>;
+  release(resource: T): PromiseLike<void>;
 
   /**
    * This function is for when you want to return a resource to the pool but want it destroyed rather than being made available to other resources. E.g. you may know the resource has timed out or crashed.
    */
-  destroy(resource: T): Promise<void>;
+  destroy(resource: T): PromiseLike<void>;
 
   /**
    * If you are shutting down a long-lived process, you may notice that node fails to exit for 30 seconds or so. This is a side effect of the `idleTimeoutMillis` behavior -- the pool has a `setTimeout()` call registered that is in the event loop queue, so node won't terminate until all resources have timed out, and the pool stops trying to manage them.
@@ -106,7 +106,7 @@ export class Pool<T> extends EventEmitter {
    *
    * If you do this, your node process will exit gracefully.
    */
-  drain(): Promise<void>;
+  drain(): PromiseLike<void>;
 
   /**
    * If you know you would like to terminate all the available resources in your pool before any timeouts they might have are reached, you can use `clear()` in conjunction with `drain()`:
@@ -115,7 +115,7 @@ export class Pool<T> extends EventEmitter {
    * pool.drain().then(() => pool.clear());
    * ```
    */
-  clear(): Promise<void>;
+  clear(): PromiseLike<void>;
 
   /**
    * The combined count of the currently created objects and those in the
