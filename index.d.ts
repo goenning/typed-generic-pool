@@ -85,17 +85,17 @@ export class Pool<T> extends EventEmitter {
   /**
    * This function is for when you want to "borrow" a resource from the pool.
    */
-  acquire(priority?: number): PromiseLike<T>;
+  acquire(priority?: number): Promise<T>;
 
   /**
    * This function is for when you want to return a resource to the pool.
    */
-  release(resource: T): PromiseLike<void>;
+  release(resource: T): Promise<void>;
 
   /**
    * This function is for when you want to return a resource to the pool but want it destroyed rather than being made available to other resources. E.g. you may know the resource has timed out or crashed.
    */
-  destroy(resource: T): PromiseLike<void>;
+  destroy(resource: T): Promise<void>;
 
   /**
    * If you are shutting down a long-lived process, you may notice that node fails to exit for 30 seconds or so. This is a side effect of the `idleTimeoutMillis` behavior -- the pool has a `setTimeout()` call registered that is in the event loop queue, so node won't terminate until all resources have timed out, and the pool stops trying to manage them.
@@ -106,7 +106,7 @@ export class Pool<T> extends EventEmitter {
    *
    * If you do this, your node process will exit gracefully.
    */
-  drain(): PromiseLike<void>;
+  drain(): Promise<void>;
 
   /**
    * If you know you would like to terminate all the available resources in your pool before any timeouts they might have are reached, you can use `clear()` in conjunction with `drain()`:
@@ -115,7 +115,7 @@ export class Pool<T> extends EventEmitter {
    * pool.drain().then(() => pool.clear());
    * ```
    */
-  clear(): PromiseLike<void>;
+  clear(): Promise<void>;
 
   /**
    * The combined count of the currently created objects and those in the
